@@ -19,9 +19,11 @@
 (function () {
   const logger = {
     info: (message, fileName = null) => {
+      /*
       console.log(
         `[Tel Download] ${fileName ? `${fileName}: ` : ""}${message}`
       );
+      */
     },
     error: (message, fileName = null) => {
       console.error(
@@ -44,6 +46,13 @@
     return h >>> 0;
   };
 
+  const reducedFileName = (fileName) => {
+    const fName = (fileName || "???");
+    return (fName.length > 30)
+      ? fName.substring(0, fName.length - 3) + "..."
+      : fName;
+  };
+
   const createProgressBar = (videoId, fileName) => {
     const isDarkMode = document.querySelector('html').classList.contains('night') || document.querySelector('html').classList.contains('theme-dark');
     const container = document.getElementById("tel-downloader-progress-bar-container");
@@ -62,15 +71,13 @@
     title.className = "filename";
     title.style.margin = 0;
     title.style.color = 'white';
-    title.style.width = '90% !important';
-    title.innerText = fileName;
+    title.innerText = reducedFileName(fileName);
 
     const closeButton = document.createElement("div");
     closeButton.style.cursor = 'pointer';
     closeButton.style.fontSize = '0.8rem';
     closeButton.style.color = isDarkMode ? '#8a8a8a' : 'rgb(182, 198, 73)';
-    closeButton.style.border = '1px solid rgb(182, 198, 73)';
-    // closeButton.innerHTML = '[X]';
+    closeButton.innerHTML = '[X]';
     closeButton.onclick = function() {
       container.removeChild(innerContainer);
     };
@@ -92,6 +99,7 @@
     counter.style.transform = "translate(-50%, -50%)";
     counter.style.margin = 0;
     counter.style.color = "black";
+
     const progress = document.createElement("div");
     progress.style.position = "absolute";
     progress.style.height = "100%";
@@ -105,38 +113,37 @@
     innerContainer.appendChild(flexContainer);
     innerContainer.appendChild(progressBar);
     container.appendChild(innerContainer);
-
-    const myTimeout = setTimeout(() => {
-      if(progress.style.width == "100%") {
-        container.removeChild(innerContainer);
-        clearTimeout(myTimeout);
-      }
-    }, 5000);
   }
 
   const updateProgress = (videoId, fileName, progress) => {
     const innerContainer = document.getElementById("tel-downloader-progress-" + videoId);
-    innerContainer.querySelector("p.filename").innerText = fileName;
+    innerContainer.querySelector("p.filename").innerText = reducedFileName(fileName);
     const progressBar = innerContainer.querySelector("div.progress");
     progressBar.querySelector("p").innerText = progress + "%";
     progressBar.querySelector("div").style.width = progress + "%";
   }
 
   const completeProgress = (videoId) => {
-    const progressBar = document.getElementById("tel-downloader-progress-" + videoId).querySelector("div.progress");
+    const container = document.getElementById("tel-downloader-progress-bar-container");
+    const innerContainer = document.getElementById("tel-downloader-progress-" + videoId);
+    const progressBar = innerContainer.querySelector("div.progress");
     progressBar.querySelector("p").innerText = "Completed";
     progressBar.querySelector("div").style.backgroundColor = "#B6C649";
     progressBar.querySelector("div").style.width = "100%";
+
+    setTimeout(() => {
+      container.removeChild(innerContainer);
+    }, 2000);
   }
 
-  const AbortProgress = (videoId) => {
+  const abortProgress = (videoId) => {
     const progressBar = document.getElementById("tel-downloader-progress-" + videoId).querySelector("div.progress");
     progressBar.querySelector("p").innerText = "Aborted";
     progressBar.querySelector("div").style.backgroundColor = "#D16666";
     progressBar.querySelector("div").style.width = "100%";
   }
 
-  const close_viewer = () => {
+  const closeViewer = () => {
     var spans = document.getElementsByClassName("tgico button-icon");
     for(let i=0; i < spans.length; i++) {
       try {
@@ -256,7 +263,7 @@
         })
         .catch((reason) => {
           logger.error(reason, fileName);
-          AbortProgress(videoId);
+          abortProgress(videoId);
         });
     };
 
@@ -497,7 +504,7 @@
       downloadButton.appendChild(downloadIcon);
       downloadButton.onclick = () => {
         tel_download_video(videoPlayer.querySelector("video").currentSrc);
-        close_viewer();
+        closeViewer();
       };
 
       // Add download button to video controls
@@ -527,7 +534,7 @@
           // Update existing button
           telDownloadButton.onclick = () => {
             tel_download_video(videoPlayer.querySelector("video").currentSrc);
-            close_viewer();
+            closeViewer();
           };
           telDownloadButton.setAttribute("data-tel-download-url", videoUrl);
         }
@@ -542,7 +549,7 @@
       downloadButton.appendChild(downloadIcon);
       downloadButton.onclick = () => {
         tel_download_image(img.src);
-        close_viewer();
+        closeViewer();
       };
 
       // Add/Update/Remove download button to topbar
@@ -562,7 +569,7 @@
           // Update existing button
           telDownloadButton.onclick = () => {
             tel_download_image(img.src);
-            close_viewer();
+            closeViewer();
           };
           telDownloadButton.setAttribute("data-tel-download-url", img.src);
         }
@@ -641,7 +648,10 @@
       if (btn.textContent === DOWNLOAD_ICON) {
         btn.classList.add('tgico-download');
         // Use official download buttons
-        onDownload = () => { btn.click(); close_viewer(); };
+        onDownload = () => {
+          btn.click();
+          closeViewer();
+        };
         logger.info("onDownload", onDownload);
       }
     }
@@ -671,7 +681,7 @@
         } else {
           downloadButton.onclick = () => {
             tel_download_video(mediaAspecter.querySelector("video").src);
-            close_viewer();
+            closeViewer();
           };
         }
         brControls.prepend(downloadButton);
@@ -695,7 +705,7 @@
       } else {
         downloadButton.onclick = () => {
           tel_download_video(mediaAspecter.querySelector("video").src);
-          close_viewer();
+          closeViewer();
         };
       }
       mediaButtons.prepend(downloadButton);
@@ -717,7 +727,7 @@
       } else {
         downloadButton.onclick = () => {
           tel_download_image(mediaAspecter.querySelector("img.thumbnail").src);
-          close_viewer();
+          closeViewer();
         };
       }
       mediaButtons.prepend(downloadButton);
