@@ -12,6 +12,8 @@
 // @match        https://webk.telegram.org/*
 // @match        https://webz.telegram.org/*
 // @icon         https://img.icons8.com/color/452/telegram-app--v5.png
+// @downloadURL https://update.greasyfork.org/scripts/446342/Telegram%20Media%20Downloader.user.js
+// @updateURL https://update.greasyfork.org/scripts/446342/Telegram%20Media%20Downloader.meta.js
 // ==/UserScript==
 
 (function () {
@@ -28,7 +30,7 @@
     },
   };
   // Unicode values for icons (used in /k/ app)
-  const DOWNLOAD_ICON = '\uE943';
+  const DOWNLOAD_ICON = '\u1401';
   const FORWARD_ICON = '\uE955';
   const contentRangeRegex = /^bytes (\d+)-(\d+)\/(\d+)$/;
   const REFRESH_DELAY = 500;
@@ -60,13 +62,15 @@
     title.className = "filename";
     title.style.margin = 0;
     title.style.color = 'white';
+    title.style.width = '90% !important';
     title.innerText = fileName;
 
     const closeButton = document.createElement("div");
     closeButton.style.cursor = 'pointer';
-    closeButton.style.fontSize = '1.2rem';
-    closeButton.style.color = isDarkMode ? '#8a8a8a' : 'white';
-    closeButton.innerHTML = '&times;';
+    closeButton.style.fontSize = '0.8rem';
+    closeButton.style.color = isDarkMode ? '#8a8a8a' : 'rgb(182, 198, 73)';
+    closeButton.style.border = '1px solid rgb(182, 198, 73)';
+    // closeButton.innerHTML = '[X]';
     closeButton.onclick = function() {
       container.removeChild(innerContainer);
     };
@@ -101,6 +105,13 @@
     innerContainer.appendChild(flexContainer);
     innerContainer.appendChild(progressBar);
     container.appendChild(innerContainer);
+
+    const myTimeout = setTimeout(() => {
+      if(progress.style.width == "100%") {
+        container.removeChild(innerContainer);
+        clearTimeout(myTimeout);
+      }
+    }, 5000);
   }
 
   const updateProgress = (videoId, fileName, progress) => {
@@ -124,6 +135,20 @@
     progressBar.querySelector("div").style.backgroundColor = "#D16666";
     progressBar.querySelector("div").style.width = "100%";
   }
+
+  const close_viewer = () => {
+    var spans = document.getElementsByClassName("tgico button-icon");
+    for(let i=0; i < spans.length; i++) {
+      try {
+        if((spans[i].innerHTML == '\ue932') && (spans[i].offsetParent !== null)) {
+          spans[i].click();
+          break;
+        }
+      } catch(e) {
+        // ...
+      }
+    }
+  };
 
   const tel_download_video = (url) => {
     let _blobs = [];
@@ -472,6 +497,7 @@
       downloadButton.appendChild(downloadIcon);
       downloadButton.onclick = () => {
         tel_download_video(videoPlayer.querySelector("video").currentSrc);
+        close_viewer();
       };
 
       // Add download button to video controls
@@ -501,6 +527,7 @@
           // Update existing button
           telDownloadButton.onclick = () => {
             tel_download_video(videoPlayer.querySelector("video").currentSrc);
+            close_viewer();
           };
           telDownloadButton.setAttribute("data-tel-download-url", videoUrl);
         }
@@ -515,6 +542,7 @@
       downloadButton.appendChild(downloadIcon);
       downloadButton.onclick = () => {
         tel_download_image(img.src);
+        close_viewer();
       };
 
       // Add/Update/Remove download button to topbar
@@ -534,6 +562,7 @@
           // Update existing button
           telDownloadButton.onclick = () => {
             tel_download_image(img.src);
+            close_viewer();
           };
           telDownloadButton.setAttribute("data-tel-download-url", img.src);
         }
@@ -612,7 +641,7 @@
       if (btn.textContent === DOWNLOAD_ICON) {
         btn.classList.add('tgico-download');
         // Use official download buttons
-        onDownload = () => { btn.click(); };
+        onDownload = () => { btn.click(); close_viewer(); };
         logger.info("onDownload", onDownload);
       }
     }
@@ -642,6 +671,7 @@
         } else {
           downloadButton.onclick = () => {
             tel_download_video(mediaAspecter.querySelector("video").src);
+            close_viewer();
           };
         }
         brControls.prepend(downloadButton);
@@ -665,6 +695,7 @@
       } else {
         downloadButton.onclick = () => {
           tel_download_video(mediaAspecter.querySelector("video").src);
+          close_viewer();
         };
       }
       mediaButtons.prepend(downloadButton);
@@ -686,6 +717,7 @@
       } else {
         downloadButton.onclick = () => {
           tel_download_image(mediaAspecter.querySelector("img.thumbnail").src);
+          close_viewer();
         };
       }
       mediaButtons.prepend(downloadButton);
