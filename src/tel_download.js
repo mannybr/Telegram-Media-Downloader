@@ -143,19 +143,28 @@
     progressBar.querySelector("div").style.width = "100%";
   }
 
+  const viewerWasClosed = () => {
+    return (document.getElementsByClassName("media-viewer-aspecter").length > 0);
+  }
+
   const closeViewer = () => {
     var spans = document.getElementsByClassName("tgico button-icon");
     for(let i=0; i < spans.length; i++) {
       try {
-        if((spans[i].innerHTML == '\ue932') && (spans[i].offsetParent !== null)) {
-          spans[i].click();
-          break;
+        if((spans[i].innerHTML == '\ue934') && (spans[i].offsetParent !== null)) {
+          spans[i].style.color = '#FF0000';
+          setTimeout(() => {
+            spans[i].click();
+          }, 1000);
+          if(viewerWasClosed()) {
+            break;
+          }
         }
       } catch(e) {
         // ...
       }
     }
-  };
+  }
 
   const tel_download_video = (url) => {
     let _blobs = [];
