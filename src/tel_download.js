@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Telegram Media Downloader
 // @name:zh-CN   Telegram图片视频下载器
-// @version      1.106
+// @version      1.107
 // @namespace    https://github.com/Neet-Nestor/Telegram-Media-Downloader
 // @description  Download images, GIFs, videos, and voice messages on the Telegram webapp from private channels that disable downloading and restrict saving content
 // @description:zh-cn 从禁止下载的Telegram频道中下载图片、视频及语音消息
@@ -19,11 +19,9 @@
 (function () {
   const logger = {
     info: (message, fileName = null) => {
-      /*
       console.log(
         `[Tel Download] ${fileName ? `${fileName}: ` : ""}${message}`
       );
-      */
     },
     error: (message, fileName = null) => {
       console.error(
@@ -32,6 +30,7 @@
     },
   };
 
+  // LGMCJR
   try {
     let myStyle = document.createElement("style");
     myStyle.innerText = ".bottom-controls { margin-top: 15px !important }";
@@ -41,8 +40,10 @@
   }
 
   // Unicode values for icons (used in /k/ app)
+  // LGMCJR
   const DOWNLOAD_ICON = '\u1401';
   const FORWARD_ICON = '\uE955';
+
   const contentRangeRegex = /^bytes (\d+)-(\d+)\/(\d+)$/;
   const REFRESH_DELAY = 500;
   const hashCode = (s) => {
@@ -55,6 +56,7 @@
     return h >>> 0;
   };
 
+  // LGMCJR
   const reducedFileName = (fileName) => {
     const fName = (fileName || "???");
     return (fName.length > 30)
@@ -80,13 +82,20 @@
     title.className = "filename";
     title.style.margin = 0;
     title.style.color = 'white';
+
+    // LGMCJR
     title.innerText = reducedFileName(fileName);
 
     const closeButton = document.createElement("div");
     closeButton.style.cursor = 'pointer';
+
+    // LGMCJR
     closeButton.style.fontSize = '0.8rem';
-    closeButton.style.color = isDarkMode ? '#8a8a8a' : 'rgb(182, 198, 73)';
+    closeButton.style.color = isDarkMode ? '#8a8a8a' : 'white';
+
+    // LGMCJR
     closeButton.innerHTML = '[X]';
+
     closeButton.onclick = function() {
       container.removeChild(innerContainer);
     };
@@ -108,7 +117,6 @@
     counter.style.transform = "translate(-50%, -50%)";
     counter.style.margin = 0;
     counter.style.color = "black";
-
     const progress = document.createElement("div");
     progress.style.position = "absolute";
     progress.style.height = "100%";
@@ -126,36 +134,42 @@
 
   const updateProgress = (videoId, fileName, progress) => {
     const innerContainer = document.getElementById("tel-downloader-progress-" + videoId);
+
+    // LGMCJR
     innerContainer.querySelector("p.filename").innerText = reducedFileName(fileName);
+
     const progressBar = innerContainer.querySelector("div.progress");
     progressBar.querySelector("p").innerText = progress + "%";
     progressBar.querySelector("div").style.width = progress + "%";
   }
 
   const completeProgress = (videoId) => {
-    const container = document.getElementById("tel-downloader-progress-bar-container");
-    const innerContainer = document.getElementById("tel-downloader-progress-" + videoId);
-    const progressBar = innerContainer.querySelector("div.progress");
+    const progressBar = document.getElementById("tel-downloader-progress-" + videoId).querySelector("div.progress");
     progressBar.querySelector("p").innerText = "Completed";
     progressBar.querySelector("div").style.backgroundColor = "#B6C649";
     progressBar.querySelector("div").style.width = "100%";
 
+    // LGMCJR
+    const container = document.getElementById("tel-downloader-progress-bar-container");
+    const innerContainer = document.getElementById("tel-downloader-progress-" + videoId);
     setTimeout(() => {
       container.removeChild(innerContainer);
     }, 2000);
   }
 
-  const abortProgress = (videoId) => {
+  const AbortProgress = (videoId) => {
     const progressBar = document.getElementById("tel-downloader-progress-" + videoId).querySelector("div.progress");
     progressBar.querySelector("p").innerText = "Aborted";
     progressBar.querySelector("div").style.backgroundColor = "#D16666";
     progressBar.querySelector("div").style.width = "100%";
   }
 
+  // LGMCJR
   const viewerWasClosed = () => {
     return (document.getElementsByClassName("media-viewer-aspecter").length > 0);
   }
 
+  // LGMCJR
   const closeViewer = () => {
     var spans = document.getElementsByClassName("tgico button-icon");
     for(let i=0; i < spans.length; i++) {
@@ -196,7 +210,9 @@
     } catch (e) {
       // Invalid JSON string, pass extracting fileName
     }
-    logger.info(`URL: ${url}`, fileName);
+
+    // LGMCJR
+    // logger.info(`URL: ${url}`, fileName);
 
     const fetchNextPart = (_writable) => {
       fetch(url, {
@@ -228,9 +244,12 @@
           const totalSize = parseInt(match[3]);
 
           if (startOffset !== _next_offset) {
-            logger.error("Gap detected between responses.", fileName);
-            logger.info("Last offset: " + _next_offset, fileName);
-            logger.info("New start offset " + match[1], fileName);
+
+            // LGMCJR
+            // logger.error("Gap detected between responses.", fileName);
+            // logger.info("Last offset: " + _next_offset, fileName);
+            // logger.info("New start offset " + match[1], fileName);
+
             throw "Gap detected between responses.";
           }
           if (_total_size && totalSize !== _total_size) {
@@ -271,7 +290,8 @@
           } else {
             if (_writable !== null) {
               _writable.close().then(() => {
-                logger.info("Download finished", fileName);
+                // LGMCJR
+                // logger.info("Download finished", fileName);
               });
             } else {
               save();
@@ -280,19 +300,23 @@
           }
         })
         .catch((reason) => {
-          logger.error(reason, fileName);
-          abortProgress(videoId);
+          // LGMCJR
+          // logger.error(reason, fileName);
+
+          AbortProgress(videoId);
         });
     };
 
     const save = () => {
-      logger.info("Finish downloading blobs", fileName);
-      logger.info("Concatenating blobs and downloading...", fileName);
+      // LGMCJR
+      // logger.info("Finish downloading blobs", fileName);
+      // logger.info("Concatenating blobs and downloading...", fileName);
 
       const blob = new Blob(_blobs, { type: "video/mp4" });
       const blobUrl = window.URL.createObjectURL(blob);
 
-      logger.info("Final blob size: " + blob.size + " bytes", fileName);
+      // LGMCJR
+      // logger.info("Final blob size: " + blob.size + " bytes", fileName);
 
       const a = document.createElement("a");
       document.body.appendChild(a);
@@ -302,7 +326,8 @@
       document.body.removeChild(a);
       window.URL.revokeObjectURL(blobUrl);
 
-      logger.info("Download triggered", fileName);
+      // LGMCJR
+      // logger.info("Download triggered", fileName);
     };
 
     const supportsFileSystemAccess =
@@ -322,11 +347,13 @@
           fetchNextPart(writable);
           createProgressBar(videoId);
         }).catch((err) => {
-          console.error(err.name, err.message);
+          // LGMCJR
+          // console.error(err.name, err.message);
         });
       }).catch((err) => {
         if (err.name !== 'AbortError') {
-          console.error(err.name, err.message);
+          // LGMCJR
+          // console.error(err.name, err.message);
         }
       });
     } else {
@@ -350,19 +377,27 @@
       })
         .then((res) => {
           if (res.status !== 206 && res.status !== 200) {
+            // LGMCJR
+            /*
             logger.error(
               "Non 200/206 response was received: " + res.status,
               fileName
             );
+            */
+
             return;
           }
 
           const mime = res.headers.get("Content-Type").split(";")[0];
           if (!mime.startsWith("audio/")) {
+            // LGMCJR
+            /*
             logger.error(
               "Get non audio response with MIME type " + mime,
               fileName
             );
+            */
+
             throw "Get non audio response with MIME type " + mime;
           }
 
@@ -376,24 +411,32 @@
             const totalSize = parseInt(match[3]);
 
             if (startOffset !== _next_offset) {
-              logger.error("Gap detected between responses.");
-              logger.info("Last offset: " + _next_offset);
-              logger.info("New start offset " + match[1]);
+              // LGMCJR
+              // logger.error("Gap detected between responses.");
+              // logger.info("Last offset: " + _next_offset);
+              // logger.info("New start offset " + match[1]);
+
               throw "Gap detected between responses.";
             }
             if (_total_size && totalSize !== _total_size) {
-              logger.error("Total size differs");
+              // LGMCJR
+              // logger.error("Total size differs");
+
               throw "Total size differs";
             }
 
             _next_offset = endOffset + 1;
             _total_size = totalSize;
           } finally {
+            // LGMCJR
+            /*
             logger.info(
               `Get response: ${res.headers.get(
                 "Content-Length"
               )} bytes data from ${res.headers.get("Content-Range")}`
             );
+            */
+
             return res.blob();
           }
         })
@@ -410,7 +453,8 @@
           } else {
             if (_writable !== null) {
               _writable.close().then(() => {
-                logger.info("Download finished", fileName);
+                // LGMCJR
+                // logger.info("Download finished", fileName);
               });
             } else {
               save();
@@ -418,20 +462,25 @@
           }
         })
         .catch((reason) => {
-          logger.error(reason, fileName);
+          // LGMCJR
+          // logger.error(reason, fileName);
         });
     };
 
     const save = () => {
+      // LGMCJR
+      /*
       logger.info(
         "Finish downloading blobs. Concatenating blobs and downloading...",
         fileName
       );
+      */
 
       let blob = new Blob(_blobs, { type: "audio/ogg" });
       const blobUrl = window.URL.createObjectURL(blob);
 
-      logger.info("Final blob size in bytes: " + blob.size, fileName);
+      // LGMCJR
+      // logger.info("Final blob size in bytes: " + blob.size, fileName);
 
       blob = 0;
 
@@ -443,7 +492,8 @@
       document.body.removeChild(a);
       window.URL.revokeObjectURL(blobUrl);
 
-      logger.info("Download triggered", fileName);
+      // LGMCJR
+      // logger.info("Download triggered", fileName);
     };
 
     const supportsFileSystemAccess =
@@ -462,11 +512,13 @@
         handle.createWritable().then((writable) => {
           fetchNextPart(writable);
         }).catch((err) => {
-          console.error(err.name, err.message);
+          // LGMCJR
+          // console.error(err.name, err.message);
         });
       }).catch((err) => {
         if (err.name !== 'AbortError') {
-          console.error(err.name, err.message);
+          // LGMCJR
+          // console.error(err.name, err.message);
         }
       });
     } else {
@@ -485,10 +537,12 @@
     a.click();
     document.body.removeChild(a);
 
-    logger.info("Download triggered", fileName);
+    // LGMCJR
+    // logger.info("Download triggered", fileName);
   };
 
-  logger.info("Initialized");
+  // LGMCJR
+  // logger.info("Initialized");
 
   // For webz /a/ webapp
   setInterval(() => {
@@ -522,6 +576,8 @@
       downloadButton.appendChild(downloadIcon);
       downloadButton.onclick = () => {
         tel_download_video(videoPlayer.querySelector("video").currentSrc);
+
+        // LGMCJR
         closeViewer();
       };
 
@@ -552,6 +608,8 @@
           // Update existing button
           telDownloadButton.onclick = () => {
             tel_download_video(videoPlayer.querySelector("video").currentSrc);
+
+            // LGMCJR
             closeViewer();
           };
           telDownloadButton.setAttribute("data-tel-download-url", videoUrl);
@@ -567,6 +625,8 @@
       downloadButton.appendChild(downloadIcon);
       downloadButton.onclick = () => {
         tel_download_image(img.src);
+
+        // LGMCJR
         closeViewer();
       };
 
@@ -587,6 +647,8 @@
           // Update existing button
           telDownloadButton.onclick = () => {
             tel_download_image(img.src);
+
+            // LGMCJR
             closeViewer();
           };
           telDownloadButton.setAttribute("data-tel-download-url", img.src);
@@ -632,6 +694,9 @@
         downloadButtonPinnedAudio.onclick = (e) => {
           e.stopPropagation();
           tel_download_audio(link);
+
+          // LGMCJR
+          closeViewer();
         };
         downloadButtonPinnedAudio.setAttribute("data-mid", dataMid);
         const link =
@@ -668,6 +733,8 @@
         // Use official download buttons
         onDownload = () => {
           btn.click();
+
+          // LGMCJR
           closeViewer();
         };
         logger.info("onDownload", onDownload);
@@ -699,6 +766,8 @@
         } else {
           downloadButton.onclick = () => {
             tel_download_video(mediaAspecter.querySelector("video").src);
+
+            // LGMCJR
             closeViewer();
           };
         }
@@ -723,6 +792,8 @@
       } else {
         downloadButton.onclick = () => {
           tel_download_video(mediaAspecter.querySelector("video").src);
+
+          // LGMCJR
           closeViewer();
         };
       }
@@ -745,6 +816,8 @@
       } else {
         downloadButton.onclick = () => {
           tel_download_image(mediaAspecter.querySelector("img.thumbnail").src);
+
+          // LGMCJR
           closeViewer();
         };
       }
