@@ -65,8 +65,9 @@
   // LGMCJR
   const reducedFileName = (fileName) => {
     const fName = (fileName || "???");
-    return (fName.length > 20)
-      ? fName.substring(0, fName.length - 3) + "..."
+    const maxLen = 30;
+    return (fName.length > maxLen)
+      ? fName.substring(0, (maxLen - 3)) + "..."
       : fName;
   };
 
