@@ -31,6 +31,15 @@
       );
     },
   };
+
+  try {
+    let myStyle = document.createElement("style");
+    myStyle.innerText = ".bottom-controls { margin-top: 15px !important }";
+    document.head.appendChild(myStyle);
+  } catch(e) {
+    // ...
+  }
+
   // Unicode values for icons (used in /k/ app)
   const DOWNLOAD_ICON = '\u1401';
   const FORWARD_ICON = '\uE955';
@@ -152,10 +161,10 @@
     for(let i=0; i < spans.length; i++) {
       try {
         if((spans[i].innerHTML == '\ue934') && (spans[i].offsetParent !== null)) {
-          spans[i].style.color = '#FF0000';
-          setTimeout(() => {
+          // spans[i].style.color = '#FF0000';
+          // setTimeout(() => {
             spans[i].click();
-          }, 1000);
+          // }, 1000);
           if(viewerWasClosed()) {
             break;
           }
