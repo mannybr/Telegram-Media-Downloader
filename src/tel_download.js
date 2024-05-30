@@ -19,14 +19,20 @@
 (function () {
   const logger = {
     info: (message, fileName = null) => {
+      // LGMCJR
+      /*
       console.log(
         `[Tel Download] ${fileName ? `${fileName}: ` : ""}${message}`
       );
+      */
     },
     error: (message, fileName = null) => {
+      // LGMCJR
+      /*
       console.error(
         `[Tel Download] ${fileName ? `${fileName}: ` : ""}${message}`
       );
+      */
     },
   };
 
@@ -59,7 +65,7 @@
   // LGMCJR
   const reducedFileName = (fileName) => {
     const fName = (fileName || "???");
-    return (fName.length > 30)
+    return (fName.length > 20)
       ? fName.substring(0, fName.length - 3) + "..."
       : fName;
   };
@@ -91,6 +97,7 @@
 
     // LGMCJR
     closeButton.style.fontSize = '0.8rem';
+
     closeButton.style.color = isDarkMode ? '#8a8a8a' : 'white';
 
     // LGMCJR
@@ -211,8 +218,7 @@
       // Invalid JSON string, pass extracting fileName
     }
 
-    // LGMCJR
-    // logger.info(`URL: ${url}`, fileName);
+    logger.info(`URL: ${url}`, fileName);
 
     const fetchNextPart = (_writable) => {
       fetch(url, {
@@ -244,12 +250,9 @@
           const totalSize = parseInt(match[3]);
 
           if (startOffset !== _next_offset) {
-
-            // LGMCJR
-            // logger.error("Gap detected between responses.", fileName);
-            // logger.info("Last offset: " + _next_offset, fileName);
-            // logger.info("New start offset " + match[1], fileName);
-
+            logger.error("Gap detected between responses.", fileName);
+            logger.info("Last offset: " + _next_offset, fileName);
+            logger.info("New start offset " + match[1], fileName);
             throw "Gap detected between responses.";
           }
           if (_total_size && totalSize !== _total_size) {
@@ -290,8 +293,7 @@
           } else {
             if (_writable !== null) {
               _writable.close().then(() => {
-                // LGMCJR
-                // logger.info("Download finished", fileName);
+                logger.info("Download finished", fileName);
               });
             } else {
               save();
@@ -300,23 +302,19 @@
           }
         })
         .catch((reason) => {
-          // LGMCJR
-          // logger.error(reason, fileName);
-
+          logger.error(reason, fileName);
           AbortProgress(videoId);
         });
     };
 
     const save = () => {
-      // LGMCJR
-      // logger.info("Finish downloading blobs", fileName);
-      // logger.info("Concatenating blobs and downloading...", fileName);
+      logger.info("Finish downloading blobs", fileName);
+      logger.info("Concatenating blobs and downloading...", fileName);
 
       const blob = new Blob(_blobs, { type: "video/mp4" });
       const blobUrl = window.URL.createObjectURL(blob);
 
-      // LGMCJR
-      // logger.info("Final blob size: " + blob.size + " bytes", fileName);
+      logger.info("Final blob size: " + blob.size + " bytes", fileName);
 
       const a = document.createElement("a");
       document.body.appendChild(a);
@@ -326,8 +324,7 @@
       document.body.removeChild(a);
       window.URL.revokeObjectURL(blobUrl);
 
-      // LGMCJR
-      // logger.info("Download triggered", fileName);
+      logger.info("Download triggered", fileName);
     };
 
     const supportsFileSystemAccess =
@@ -348,12 +345,12 @@
           createProgressBar(videoId);
         }).catch((err) => {
           // LGMCJR
-          // console.error(err.name, err.message);
+          logger.error(err.message, fileName);
         });
       }).catch((err) => {
         if (err.name !== 'AbortError') {
           // LGMCJR
-          // console.error(err.name, err.message);
+          logger.error(err.message, fileName);
         }
       });
     } else {
@@ -377,27 +374,19 @@
       })
         .then((res) => {
           if (res.status !== 206 && res.status !== 200) {
-            // LGMCJR
-            /*
             logger.error(
               "Non 200/206 response was received: " + res.status,
               fileName
             );
-            */
-
             return;
           }
 
           const mime = res.headers.get("Content-Type").split(";")[0];
           if (!mime.startsWith("audio/")) {
-            // LGMCJR
-            /*
             logger.error(
               "Get non audio response with MIME type " + mime,
               fileName
             );
-            */
-
             throw "Get non audio response with MIME type " + mime;
           }
 
@@ -411,32 +400,24 @@
             const totalSize = parseInt(match[3]);
 
             if (startOffset !== _next_offset) {
-              // LGMCJR
-              // logger.error("Gap detected between responses.");
-              // logger.info("Last offset: " + _next_offset);
-              // logger.info("New start offset " + match[1]);
-
+              logger.error("Gap detected between responses.");
+              logger.info("Last offset: " + _next_offset);
+              logger.info("New start offset " + match[1]);
               throw "Gap detected between responses.";
             }
             if (_total_size && totalSize !== _total_size) {
-              // LGMCJR
-              // logger.error("Total size differs");
-
+              logger.error("Total size differs");
               throw "Total size differs";
             }
 
             _next_offset = endOffset + 1;
             _total_size = totalSize;
           } finally {
-            // LGMCJR
-            /*
             logger.info(
               `Get response: ${res.headers.get(
                 "Content-Length"
               )} bytes data from ${res.headers.get("Content-Range")}`
             );
-            */
-
             return res.blob();
           }
         })
@@ -453,8 +434,7 @@
           } else {
             if (_writable !== null) {
               _writable.close().then(() => {
-                // LGMCJR
-                // logger.info("Download finished", fileName);
+                logger.info("Download finished", fileName);
               });
             } else {
               save();
@@ -462,25 +442,20 @@
           }
         })
         .catch((reason) => {
-          // LGMCJR
-          // logger.error(reason, fileName);
+          logger.error(reason, fileName);
         });
     };
 
     const save = () => {
-      // LGMCJR
-      /*
       logger.info(
         "Finish downloading blobs. Concatenating blobs and downloading...",
         fileName
       );
-      */
-
+      
       let blob = new Blob(_blobs, { type: "audio/ogg" });
       const blobUrl = window.URL.createObjectURL(blob);
 
-      // LGMCJR
-      // logger.info("Final blob size in bytes: " + blob.size, fileName);
+      logger.info("Final blob size in bytes: " + blob.size, fileName);
 
       blob = 0;
 
@@ -492,8 +467,7 @@
       document.body.removeChild(a);
       window.URL.revokeObjectURL(blobUrl);
 
-      // LGMCJR
-      // logger.info("Download triggered", fileName);
+      logger.info("Download triggered", fileName);
     };
 
     const supportsFileSystemAccess =
@@ -513,12 +487,12 @@
           fetchNextPart(writable);
         }).catch((err) => {
           // LGMCJR
-          // console.error(err.name, err.message);
+          logger.error(err.message, fileName);
         });
       }).catch((err) => {
         if (err.name !== 'AbortError') {
           // LGMCJR
-          // console.error(err.name, err.message);
+          logger.error(err.message, fileName);
         }
       });
     } else {
@@ -537,12 +511,10 @@
     a.click();
     document.body.removeChild(a);
 
-    // LGMCJR
-    // logger.info("Download triggered", fileName);
+    logger.info("Download triggered", fileName);
   };
 
-  // LGMCJR
-  // logger.info("Initialized");
+  logger.info("Initialized");
 
   // For webz /a/ webapp
   setInterval(() => {
