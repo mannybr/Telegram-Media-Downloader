@@ -177,16 +177,23 @@
     return (document.getElementsByClassName("media-viewer-aspecter").length > 0);
   }
 
+  const closeButtonChars = ['\ue934', '\ue937'];
+  const closeButtonClick = (button) => {
+    if(button) {
+      // spans[i].style.color = '#FF0000';
+      // setTimeout(() => {
+      button.click();
+      // }, 1000);
+    }
+  };
+
   // LGMCJR
   const closeViewer = () => {
     var spans = document.getElementsByClassName("tgico button-icon");
     for(let i=0; i < spans.length; i++) {
       try {
-        if((spans[i].innerHTML == '\ue934') && (spans[i].offsetParent !== null)) {
-          // spans[i].style.color = '#FF0000';
-          // setTimeout(() => {
-            spans[i].click();
-          // }, 1000);
+        if((spans[i].offsetParent !== null) && (closeButtonChars.indexOf(spans[i].innerHTML.trim()) >= 0)) {
+          closeButtonClick(spans[i]);
           if(viewerWasClosed()) {
             break;
           }
