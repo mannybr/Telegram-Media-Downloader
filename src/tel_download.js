@@ -2,18 +2,18 @@
 // @name         Telegram Media Downloader
 // @name:zh-CN   Telegram图片视频下载器
 // @version      1.201
-// @namespace    https://github.com/Neet-Nestor/Telegram-Media-Downloader
+// @namespace    https://github.com/mannybr/Telegram-Media-Downloader
 // @description  Download images, GIFs, videos, and voice messages on the Telegram webapp from private channels that disable downloading and restrict saving content
 // @description:zh-cn 从禁止下载的Telegram频道中下载图片、视频及语音消息
 // @author       Nestor Qin
 // @license      GNU GPLv3
-// @website      https://github.com/Neet-Nestor/Telegram-Media-Downloader
+// @website      https://github.com/mannybr/Telegram-Media-Downloader
 // @match        https://web.telegram.org/*
 // @match        https://webk.telegram.org/*
 // @match        https://webz.telegram.org/*
 // @icon         https://img.icons8.com/color/452/telegram-app--v5.png
-// @downloadURL https://update.greasyfork.org/scripts/446342/Telegram%20Media%20Downloader.user.js
-// @updateURL https://update.greasyfork.org/scripts/446342/Telegram%20Media%20Downloader.meta.js
+// @downloadURL https://raw.githubusercontent.com/mannybr/Telegram-Media-Downloader/refs/heads/main/src/tel_download.js
+// @updateURL https://raw.githubusercontent.com/mannybr/Telegram-Media-Downloader/refs/heads/main/src/meta.js
 // ==/UserScript==
 
 (function () {
