@@ -104,13 +104,20 @@
     num.style.color = "white";
     num.innerText = downloadNum();
 
-    const title = document.createElement("p");
-    title.className = "filename";
-    title.style.margin = 0;
-    title.style.color = "white";
+    // const title = document.createElement("p");
+    // title.className = "filename";
+    // title.style.margin = 0;
+    // title.style.color = "white";
 
     // LGMCJR
-    title.innerText = reducedFileName(fileName);
+    // title.innerText = reducedFileName(fileName);
+
+    // LGMCJR
+    const title = document.createElement("input");
+    title.setAttribute('type', 'text');
+    title.setAttribute('class', 'filename');
+    title.setAttribute("style", "border: none; font-size: 15px");
+    title.value = reducedFileName(fileName);
 
     const closeButton = document.createElement("div");
     closeButton.style.cursor = "pointer";
@@ -168,7 +175,10 @@
     );
 
     // LGMCJR
-    innerContainer.querySelector("p.filename").innerText = reducedFileName(fileName);
+    // innerContainer.querySelector("p.filename").innerText = reducedFileName(fileName);
+
+    // LGMCJR
+    // innerContainer.querySelector("input.filename").value = reducedFileName(fileName);
 
     const progressBar = innerContainer.querySelector("div.progress");
     progressBar.querySelector("p").innerText = progress + "%";
@@ -399,7 +409,7 @@
             .createWritable()
             .then((writable) => {
               fetchNextPart(writable);
-              createProgressBar(videoId);
+              createProgressBar(videoId, fileName);
             })
             .catch((err) => {
               // LGMCJR
@@ -414,7 +424,7 @@
         });
     } else {
       fetchNextPart(null);
-      createProgressBar(videoId);
+      createProgressBar(videoId, fileName);
     }
   };
 
