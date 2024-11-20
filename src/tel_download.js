@@ -50,6 +50,8 @@
   const DOWNLOAD_ICON = '\u1401';
   const FORWARD_ICON = '\uE955';
 
+  var downloadCount = 0;
+
   const contentRangeRegex = /^bytes (\d+)-(\d+)\/(\d+)$/;
   const REFRESH_DELAY = 500;
   const hashCode = (s) => {
@@ -62,6 +64,10 @@
       }
     }
     return h >>> 0;
+  };
+
+  const downloadNum = () => {
+    return (downloadCount++).toString().padStart(2, '0');
   };
 
   // LGMCJR
@@ -93,6 +99,11 @@
     flexContainer.style.display = "flex";
     flexContainer.style.justifyContent = "space-between";
 
+    // LGMCJR
+    const num = document.createElement("span");
+    num.style.color = "white";
+    num.innerText = downloadNum();
+
     const title = document.createElement("p");
     title.className = "filename";
     title.style.margin = 0;
@@ -113,6 +124,7 @@
     closeButton.innerHTML = '[X]';
 
     closeButton.onclick = function () {
+      downloadCount--;
       container.removeChild(innerContainer);
     };
 
@@ -133,6 +145,7 @@
     counter.style.transform = "translate(-50%, -50%)";
     counter.style.margin = 0;
     counter.style.color = "black";
+
     const progress = document.createElement("div");
     progress.style.position = "absolute";
     progress.style.height = "100%";
@@ -141,6 +154,7 @@
 
     progressBar.appendChild(counter);
     progressBar.appendChild(progress);
+    flexContainer.appendChild(num);
     flexContainer.appendChild(title);
     flexContainer.appendChild(closeButton);
     innerContainer.appendChild(flexContainer);
@@ -173,6 +187,7 @@
     const container = document.getElementById("tel-downloader-progress-bar-container");
     const innerContainer = document.getElementById("tel-downloader-progress-" + videoId);
     setTimeout(() => {
+      downloadCount--;
       container.removeChild(innerContainer);
     }, 2000);
   };
